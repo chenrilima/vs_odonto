@@ -1,0 +1,118 @@
+"use client";
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import { Brand } from "./Brand";
+const links = [
+  ["Início", "#inicio"],
+  ["Tratamentos", "#tratamentos"],
+  ["Clínica", "#clinica"],
+  ["Sobre", "#sobre"],
+  ["Avaliações", "#avaliacoes"],
+  ["Localização", "#localizacao"],
+];
+export function Header({ onBooking }: { onBooking: () => void }) {
+  const [open, setOpen] = useState(false);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!open) return;
+    const prior = document.body.style.overflow;
+    const menuButton = buttonRef.current;
+    document.body.style.overflow = "hidden";
+    panelRef.current?.querySelector<HTMLAnchorElement>("a")?.focus();
+    const keydown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setOpen(false);
+      if (event.key !== "Tab" || !panelRef.current) return;
+      const items = [
+        ...panelRef.current.querySelectorAll<HTMLElement>(
+          "a,button:not([disabled])",
+        ),
+      ];
+      const first = items[0],
+        last = items.at(-1);
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last?.focus();
+      }
+      if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first?.focus();
+      }
+    };
+    document.addEventListener("keydown", keydown);
+    return () => {
+      document.body.style.overflow = prior;
+      document.removeEventListener("keydown", keydown);
+      menuButton?.focus();
+    };
+  }, [open]);
+  return (
+    <>
+      <header className="site-header">
+        <div className="container header-inner">
+          <a href="#inicio" className="brand-link">
+            <Brand />
+          </a>
+          <nav className="desktop-nav" aria-label="Navegação principal">
+            {links.map(([label, href]) => (
+              <a key={href} href={href}>
+                {label}
+              </a>
+            ))}
+          </nav>
+          <button
+            className="button button--small desktop-cta"
+            onClick={onBooking}
+          >
+            Agendar avaliação
+          </button>
+          <button
+            ref={buttonRef}
+            className="menu-button"
+            aria-label={open ? "Fechar menu" : "Abrir menu"}
+            aria-expanded={open}
+            aria-controls="mobile-menu"
+            onClick={() => setOpen((v) => !v)}
+          >
+            <span />
+            <span />
+          </button>
+        </div>
+      </header>
+      {open &&
+        createPortal(
+          <div
+            className="menu-backdrop"
+            onMouseDown={(e) => e.target === e.currentTarget && setOpen(false)}
+          >
+            <div ref={panelRef} id="mobile-menu" className="mobile-menu">
+              <div className="mobile-menu__top">
+                <span>Menu</span>
+                <button onClick={() => setOpen(false)} aria-label="Fechar menu">
+                  ×
+                </button>
+              </div>
+              <nav aria-label="Navegação mobile">
+                {links.map(([label, href]) => (
+                  <a key={href} href={href} onClick={() => setOpen(false)}>
+                    {label}
+                    <span aria-hidden="true">↗</span>
+                  </a>
+                ))}
+              </nav>
+              <button
+                className="button"
+                onClick={() => {
+                  setOpen(false);
+                  onBooking();
+                }}
+              >
+                Agendar avaliação
+              </button>
+            </div>
+          </div>,
+          document.body,
+        )}
+    </>
+  );
+}
