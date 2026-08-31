@@ -27,11 +27,13 @@ export const metadata: Metadata = {
     siteName: siteConfig.shortName,
     locale: "pt_BR",
     type: "website",
+    images: [{ url: "/opengraph-image", width: 1200, height: 630 }],
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: siteConfig.name,
     description: siteConfig.description,
+    images: ["/opengraph-image"],
   },
 };
 export default function RootLayout({ children }: LayoutProps<"/">) {

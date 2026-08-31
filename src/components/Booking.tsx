@@ -5,13 +5,17 @@ import { siteConfig } from "@/config/site";
 import { buildWhatsAppUrl } from "@/lib/whatsapp";
 export function BookingModal({
   open,
+  initialInterest,
   onClose,
 }: {
   open: boolean;
+  initialInterest: string;
   onClose: () => void;
 }) {
   const dialogRef = useRef<HTMLDivElement>(null),
-    nameRef = useRef<HTMLInputElement>(null);
+    nameRef = useRef<HTMLInputElement>(null),
+    interestRef = useRef<HTMLSelectElement>(null);
+  const [interest, setInterest] = useState(initialInterest);
   const [errors, setErrors] = useState<{ name?: string; interest?: string }>(
     {},
   );
@@ -46,7 +50,7 @@ export function BookingModal({
       document.removeEventListener("keydown", keydown);
       previous?.focus();
     };
-  }, [open, onClose]);
+  }, [initialInterest, open, onClose]);
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = new FormData(event.currentTarget),
@@ -60,7 +64,11 @@ export function BookingModal({
       interest: data.interest ? undefined : "Selecione um interesse.",
     };
     setErrors(nextErrors);
-    if (nextErrors.name || nextErrors.interest) return;
+    if (nextErrors.name || nextErrors.interest) {
+      if (nextErrors.name) nameRef.current?.focus();
+      else interestRef.current?.focus();
+      return;
+    }
     window.location.href = buildWhatsAppUrl(siteConfig.whatsapp, data);
   }
   if (!open) return null;
@@ -95,19 +103,23 @@ export function BookingModal({
             id="name"
             name="name"
             autoComplete="name"
+            required
             aria-invalid={!!errors.name}
             aria-describedby={errors.name ? "name-error" : undefined}
           />
           {errors.name && (
-            <span className="field-error" id="name-error">
+            <span className="field-error" id="name-error" role="alert">
               {errors.name}
             </span>
           )}
           <label htmlFor="interest">Interesse</label>
           <select
+            ref={interestRef}
             id="interest"
             name="interest"
-            defaultValue=""
+            value={interest}
+            onChange={(event) => setInterest(event.target.value)}
+            required
             aria-invalid={!!errors.interest}
             aria-describedby={errors.interest ? "interest-error" : undefined}
           >
@@ -121,7 +133,7 @@ export function BookingModal({
             <option>Outro</option>
           </select>
           {errors.interest && (
-            <span className="field-error" id="interest-error">
+            <span className="field-error" id="interest-error" role="alert">
               {errors.interest}
             </span>
           )}

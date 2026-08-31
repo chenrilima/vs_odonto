@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Brand } from "./Brand";
 const links = [
@@ -10,10 +10,23 @@ const links = [
   ["Avaliações", "#avaliacoes"],
   ["Localização", "#localizacao"],
 ];
-export function Header({ onBooking }: { onBooking: () => void }) {
+export function Header({
+  onBooking,
+  onMenuChange,
+}: {
+  onBooking: () => void;
+  onMenuChange: (open: boolean) => void;
+}) {
   const [open, setOpen] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
+  const changeOpen = useCallback(
+    (next: boolean) => {
+      setOpen(next);
+      onMenuChange(next);
+    },
+    [onMenuChange],
+  );
   useEffect(() => {
     if (!open) return;
     const prior = document.body.style.overflow;
@@ -21,7 +34,7 @@ export function Header({ onBooking }: { onBooking: () => void }) {
     document.body.style.overflow = "hidden";
     panelRef.current?.querySelector<HTMLAnchorElement>("a")?.focus();
     const keydown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setOpen(false);
+      if (event.key === "Escape") changeOpen(false);
       if (event.key !== "Tab" || !panelRef.current) return;
       const items = [
         ...panelRef.current.querySelectorAll<HTMLElement>(
@@ -43,9 +56,9 @@ export function Header({ onBooking }: { onBooking: () => void }) {
     return () => {
       document.body.style.overflow = prior;
       document.removeEventListener("keydown", keydown);
-      menuButton?.focus();
+      requestAnimationFrame(() => menuButton?.focus());
     };
-  }, [open]);
+  }, [changeOpen, open]);
   return (
     <>
       <header className="site-header">
@@ -60,6 +73,16 @@ export function Header({ onBooking }: { onBooking: () => void }) {
               </a>
             ))}
           </nav>
+          <noscript>
+            <style>{`.menu-button{display:none!important}`}</style>
+            <nav className="no-script-nav" aria-label="Navegação principal">
+              {links.map(([label, href]) => (
+                <a key={href} href={href}>
+                  {label}
+                </a>
+              ))}
+            </nav>
+          </noscript>
           <button
             className="button button--small desktop-cta"
             onClick={onBooking}
@@ -72,7 +95,7 @@ export function Header({ onBooking }: { onBooking: () => void }) {
             aria-label={open ? "Fechar menu" : "Abrir menu"}
             aria-expanded={open}
             aria-controls="mobile-menu"
-            onClick={() => setOpen((v) => !v)}
+            onClick={() => changeOpen(!open)}
           >
             <span />
             <span />
@@ -83,18 +106,23 @@ export function Header({ onBooking }: { onBooking: () => void }) {
         createPortal(
           <div
             className="menu-backdrop"
-            onMouseDown={(e) => e.target === e.currentTarget && setOpen(false)}
+            onMouseDown={(e) =>
+              e.target === e.currentTarget && changeOpen(false)
+            }
           >
             <div ref={panelRef} id="mobile-menu" className="mobile-menu">
               <div className="mobile-menu__top">
                 <span>Menu</span>
-                <button onClick={() => setOpen(false)} aria-label="Fechar menu">
+                <button
+                  onClick={() => changeOpen(false)}
+                  aria-label="Fechar menu"
+                >
                   ×
                 </button>
               </div>
               <nav aria-label="Navegação mobile">
                 {links.map(([label, href]) => (
-                  <a key={href} href={href} onClick={() => setOpen(false)}>
+                  <a key={href} href={href} onClick={() => changeOpen(false)}>
                     {label}
                     <span aria-hidden="true">↗</span>
                   </a>
@@ -103,7 +131,7 @@ export function Header({ onBooking }: { onBooking: () => void }) {
               <button
                 className="button"
                 onClick={() => {
-                  setOpen(false);
+                  changeOpen(false);
                   onBooking();
                 }}
               >

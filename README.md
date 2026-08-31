@@ -1,36 +1,41 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# VS Odonto
 
-## Getting Started
+Site institucional do Dr. Vinicius Silva e Silva — Odontologia Planejada, no Tatuapé. Construído com Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS 4/CSS global, Vitest e Playwright.
 
-First, run the development server:
+## Desenvolvimento
+
+Requer Node.js compatível com Next.js 16. Copie `.env.example` para `.env.local`, mantenha a indexação desativada localmente e execute:
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Scripts disponíveis:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- `npm run build` — build otimizado de produção;
+- `npm run lint` — análise estática;
+- `npm run typecheck` — validação TypeScript;
+- `npm run test` — testes unitários;
+- `npm run test:e2e` — testes de interface com Playwright;
+- `npm run format:check` — verificação de formatação.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Configuração pública
 
-## Learn More
+```dotenv
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+NEXT_PUBLIC_WHATSAPP_NUMBER=5511974218938
+NEXT_PUBLIC_ALLOW_INDEXING=false
+```
 
-To learn more about Next.js, take a look at the following resources:
+Em previews da Vercel, defina a URL real do preview e mantenha `NEXT_PUBLIC_ALLOW_INDEXING=false`. Para publicar no domínio oficial, configure a URL HTTPS final e somente então use `NEXT_PUBLIC_ALLOW_INDEXING=true`. Um build indexável com `localhost` é bloqueado de propósito.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Essas variáveis contêm apenas configuração pública. Não adicione segredos com o prefixo `NEXT_PUBLIC_`.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Conteúdo e imagens
 
-## Deploy on Vercel
+Dados comerciais e mídia ficam centralizados em `src/config/site.ts` e `src/data/content.ts`. As fotos aprovadas estão em `public/images/clinic`; substitua referências pelo catálogo `clinicMedia`, preservando dimensões e compressão. A imagem institucional da seção do Dr. Vinicius pode ser trocada por um retrato oficial quando aprovado pelo cliente.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Deploy
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+O projeto está preparado para Vercel. Configure as variáveis separadamente para Preview e Production, rode todas as verificações e publique primeiro em preview. HSTS e uma CSP baseada em nonce devem ser avaliados somente junto ao domínio final e à estratégia definitiva de hospedagem; os demais headers de hardening já são enviados pela aplicação.

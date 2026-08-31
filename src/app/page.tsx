@@ -5,6 +5,7 @@ import { clinicMedia, planningSteps, treatments } from "@/data/content";
 import { siteConfig } from "@/config/site";
 import Image from "next/image";
 export default function Home() {
+  const currentYear = new Date().getFullYear();
   const schema = {
     "@context": "https://schema.org",
     "@type": "Dentist",
@@ -55,7 +56,7 @@ export default function Home() {
                 alt={clinicMedia.hero.alt}
                 fill
                 priority
-                sizes="(max-width: 720px) calc(100vw - 28px), (max-width: 1000px) 42vw, 38vw"
+                sizes="(max-width: 720px) calc(100vw - 28px), (max-width: 1000px) 40vw, (max-width: 1280px) 465px, 496px"
               />
               <div className="hero__caption">
                 <p>
@@ -104,12 +105,17 @@ export default function Home() {
             <ol className="treatment-list">
               {treatments.map((item, index) => (
                 <li key={item.name}>
-                  <span>{String(index + 1).padStart(2, "0")}</span>
-                  <div>
-                    <h3>{item.name}</h3>
-                    <p>{item.description}</p>
-                  </div>
-                  <span aria-hidden="true">↗</span>
+                  <BookingTrigger
+                    className="treatment-button"
+                    interest={item.shortName}
+                  >
+                    <span>{String(index + 1).padStart(2, "0")}</span>
+                    <span>
+                      <h3>{item.name}</h3>
+                      <p>{item.description}</p>
+                    </span>
+                    <span aria-hidden="true">↗</span>
+                  </BookingTrigger>
                 </li>
               ))}
             </ol>
@@ -143,11 +149,11 @@ export default function Home() {
                 src={clinicMedia.officeChair.src}
                 alt={clinicMedia.officeChair.alt}
                 fill
-                sizes="(max-width: 720px) calc(100vw - 28px), 40vw"
+                sizes="(max-width: 720px) calc(100vw - 28px), (max-width: 1280px) 36vw, 446px"
               />
             </div>
             <div>
-              <p className="eyebrow">À frente da clínica</p>
+              <p className="eyebrow">Prática &amp; propósito</p>
               <h2>Dr. Vinicius Silva e Silva</h2>
               <p className="large-copy">
                 Uma prática orientada por planejamento, escuta e acompanhamento
@@ -187,7 +193,7 @@ export default function Home() {
                   src={clinicMedia.officePrimary.src}
                   alt={clinicMedia.officePrimary.alt}
                   fill
-                  sizes="(max-width: 720px) calc(100vw - 28px), 62vw"
+                  sizes="(max-width: 720px) calc(100vw - 28px), (max-width: 1280px) 61vw, 763px"
                 />
                 <div className="gallery__caption">
                   <span>Consultório</span>
@@ -200,7 +206,7 @@ export default function Home() {
                     src={clinicMedia.facadeEntrance.src}
                     alt={clinicMedia.facadeEntrance.alt}
                     fill
-                    sizes="(max-width: 720px) 50vw, 30vw"
+                    sizes="(max-width: 720px) calc((100vw - 44px) / 2), (max-width: 1280px) 31vw, 381px"
                   />
                   <span className="gallery__label">Fachada</span>
                 </div>
@@ -209,7 +215,7 @@ export default function Home() {
                     src={clinicMedia.officeSecondary.src}
                     alt={clinicMedia.officeSecondary.alt}
                     fill
-                    sizes="(max-width: 720px) 50vw, 30vw"
+                    sizes="(max-width: 720px) calc((100vw - 44px) / 2), (max-width: 1280px) 31vw, 381px"
                   />
                   <span className="gallery__label">Consultório</span>
                 </div>
@@ -367,7 +373,7 @@ export default function Home() {
         </div>
         <div className="container footer__bottom">
           <span>
-            © 2026 Dr. Vinicius Silva e Silva — Odontologia Planejada.
+            © {currentYear} Dr. Vinicius Silva e Silva — Odontologia Planejada.
           </span>
           <a href="#inicio">Voltar ao topo ↑</a>
         </div>

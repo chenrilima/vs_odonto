@@ -41,4 +41,26 @@ describe("WhatsApp booking", () => {
         note: "  ",
       }),
     ).not.toContain("Observação"));
+  it.each([
+    "Carlos",
+    "João",
+    "José da Silva",
+    "Ana Júlia",
+    "ç",
+    "ã",
+    "é",
+    "&",
+    "?",
+    "/",
+    "￼\t",
+  ])("round-trips %j without double encoding", (name) => {
+    const url = buildWhatsAppUrl("5511974218938", {
+      name,
+      interest: "Avaliação geral",
+    });
+    expect(url).toMatch(/^https:\/\/wa\.me\/5511974218938\?text=/);
+    const decoded = decodeURIComponent(url.split("text=")[1]);
+    expect(decoded).toContain(normalizeText(name));
+    expect(decoded).not.toContain("%25");
+  });
 });
